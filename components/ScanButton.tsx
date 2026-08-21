@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
+import { useWebHaptics } from "web-haptics/react";
 
 type ScanState = "idle" | "scanning" | "scanned";
 
@@ -22,6 +23,7 @@ function playSound(src: string) {
 
 export default function ScanButton() {
   const [state, setState] = useState<ScanState>("idle");
+  const { trigger } = useWebHaptics();
 
   useEffect(() => {
     if (state === "scanning") {
@@ -30,10 +32,11 @@ export default function ScanButton() {
     }
     if (state === "scanned") {
       playSound("/sound/action-confirmed.mp3");
+      trigger("success");
       const timer = setTimeout(() => setState("idle"), SCANNED_MS);
       return () => clearTimeout(timer);
     }
-  }, [state]);
+  }, [state, trigger]);
 
   return (
     <motion.button
@@ -46,9 +49,10 @@ export default function ScanButton() {
       }}
       disabled={state !== "idle"}
       whileTap={state === "idle" ? { scale: 0.94 } : undefined}
+      animate={{ scale: state === "scanning" ? 0.92 : 1 }}
       transition={{
         layout: { type: "spring", bounce: 0.15, duration: 0.32 },
-        scale: { duration: 0.2, ease: "easeOut" },
+        scale: { type: "spring", bounce: 0.4, duration: 0.35 },
       }}
       className="relative flex h-10 cursor-pointer items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 font-medium text-base hover:bg-neutral-100/90 disabled:cursor-default before:absolute before:-inset-2 before:content-['']"
     >
@@ -124,7 +128,7 @@ export default function ScanButton() {
             transition={{
               y: { duration: 0.2, ease: "easeOut" },
               opacity: { duration: 0.2 },
-              filter: { duration: 0.2 },
+              filter: { duration: 0.1 },
             }}
           >
             {COPY[state]}
