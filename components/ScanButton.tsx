@@ -48,7 +48,7 @@ export default function ScanButton() {
         setState("scanning");
       }}
       disabled={state !== "idle"}
-      whileTap={state === "idle" ? { scale: 0.94 } : undefined}
+      whileTap={state === "idle" ? { scale: 0.92 } : undefined}
       animate={{ scale: state === "scanning" ? 0.92 : 1 }}
       transition={{
         layout: { type: "spring", bounce: 0.15, duration: 0.32 },
@@ -68,11 +68,11 @@ export default function ScanButton() {
             {state === "scanned" ? (
               <motion.span
                 key="check"
-                initial={{ opacity: 0, scale: 0.5, filter: "blur(2px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.5, filter: "blur(2px)" }}
+                initial={{ opacity: 0, y: 2, filter: "blur(2px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -2, filter: "blur(2px)" }}
                 transition={{
-                  scale: { duration: 0.2, ease: "easeOut" },
+                  y: { duration: 0.2, ease: "easeOut" },
                   opacity: { duration: 0.2 },
                   filter: { duration: 0.2 },
                 }}
@@ -83,11 +83,11 @@ export default function ScanButton() {
             ) : (
               <motion.span
                 key="file"
-                initial={{ opacity: 0, scale: 0.5, filter: "blur(2px)" }}
-                animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
-                exit={{ opacity: 0, scale: 0.5, filter: "blur(2px)" }}
+                initial={{ opacity: 0, y: 2, filter: "blur(2px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -2, filter: "blur(2px)" }}
                 transition={{
-                  scale: { duration: 0.2, ease: "easeOut" },
+                  y: { duration: 0.2, ease: "easeOut" },
                   opacity: { duration: 0.2 },
                   filter: { duration: 0.2 },
                 }}
@@ -128,7 +128,7 @@ export default function ScanButton() {
             transition={{
               y: { duration: 0.2, ease: "easeOut" },
               opacity: { duration: 0.2 },
-              filter: { duration: 0.1 },
+              filter: { duration: 0.2 },
             }}
           >
             {COPY[state]}
