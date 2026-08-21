@@ -15,6 +15,11 @@ const COPY: Record<ScanState, string> = {
 const SCANNING_MS = 3600;
 const SCANNED_MS = 1400;
 
+function playSound(src: string) {
+  const audio = new Audio(src);
+  audio.play().catch(() => {});
+}
+
 export default function ScanButton() {
   const [state, setState] = useState<ScanState>("idle");
 
@@ -24,6 +29,7 @@ export default function ScanButton() {
       return () => clearTimeout(timer);
     }
     if (state === "scanned") {
+      playSound("/sound/action-confirmed.mp3");
       const timer = setTimeout(() => setState("idle"), SCANNED_MS);
       return () => clearTimeout(timer);
     }
@@ -33,7 +39,11 @@ export default function ScanButton() {
     <motion.button
       layout
       type="button"
-      onClick={() => state === "idle" && setState("scanning")}
+      onClick={() => {
+        if (state !== "idle") return;
+        playSound("/sound/button-click.mp3");
+        setState("scanning");
+      }}
       disabled={state !== "idle"}
       whileTap={state === "idle" ? { scale: 0.94 } : undefined}
       transition={{
@@ -48,9 +58,9 @@ export default function ScanButton() {
       >
         <motion.span
           layout
-          className="relative flex h-4 w-4 shrink-0 items-center justify-center"
+          className="relative grid h-4 w-4 shrink-0 place-items-center"
         >
-          <AnimatePresence mode="wait" initial={false}>
+          <AnimatePresence initial={false}>
             {state === "scanned" ? (
               <motion.span
                 key="check"
@@ -58,11 +68,11 @@ export default function ScanButton() {
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 exit={{ opacity: 0, scale: 0.5, filter: "blur(2px)" }}
                 transition={{
-                  scale: { type: "spring", bounce: 0.15, duration: 0.32 },
+                  scale: { duration: 0.2, ease: "easeOut" },
                   opacity: { duration: 0.2 },
                   filter: { duration: 0.2 },
                 }}
-                className="flex h-4 w-4 items-center justify-center"
+                className="[grid-area:1/1] flex h-4 w-4 items-center justify-center"
               >
                 <Image src="/circle-check.svg" alt="" width={16} height={16} />
               </motion.span>
@@ -73,11 +83,11 @@ export default function ScanButton() {
                 animate={{ opacity: 1, scale: 1, filter: "blur(0px)" }}
                 exit={{ opacity: 0, scale: 0.5, filter: "blur(2px)" }}
                 transition={{
-                  scale: { type: "spring", bounce: 0.15, duration: 0.32 },
+                  scale: { duration: 0.2, ease: "easeOut" },
                   opacity: { duration: 0.2 },
                   filter: { duration: 0.2 },
                 }}
-                className="grid h-4 w-4 place-items-center overflow-visible"
+                className="[grid-area:1/1] grid h-4 w-4 place-items-center overflow-visible"
               >
                 <Image
                   src="/File.svg"
@@ -112,7 +122,7 @@ export default function ScanButton() {
             animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
             exit={{ opacity: 0, y: -2, filter: "blur(2px)" }}
             transition={{
-              y: { type: "spring", bounce: 0.15, duration: 0.32 },
+              y: { duration: 0.2, ease: "easeOut" },
               opacity: { duration: 0.2 },
               filter: { duration: 0.2 },
             }}
