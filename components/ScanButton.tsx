@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Image from "next/image";
-import { useWebHaptics } from "web-haptics/react";
 
 type ScanState = "idle" | "scanning" | "scanned";
 
@@ -13,8 +12,25 @@ const COPY: Record<ScanState, string> = {
   scanned: "Scanned",
 };
 
-const SCANNING_MS = 3600;
-const SCANNED_MS = 1400;
+export const SCANNING_MS = 3600;
+export const SCANNED_MS = 1400;
+
+// Duration of the icon/copy blur-crossfade whenever content swaps (state
+// change, or the scanner-sweep fading in). Shared with the loop demo
+// buttons so their reveal timing can't drift from the real component.
+export const REVEAL_TRANSITION_S = 0.2;
+
+export const SCANNER_SWEEP_TRANSITION = {
+  duration: 1.8,
+  repeat: Infinity,
+  ease: "easeInOut",
+} as const;
+
+export const TAP_SCALE_TRANSITION = {
+  type: "spring",
+  bounce: 0.4,
+  duration: 0.35,
+} as const;
 
 const SOUND_SRC = {
   click: "/sound/button-click.mp3",
@@ -35,7 +51,6 @@ const LAYOUT_SPRING_ACTIVE = {
 export default function ScanButton() {
   const [state, setState] = useState<ScanState>("idle");
   const [copyReady, setCopyReady] = useState(true);
-  const { trigger } = useWebHaptics();
   const sounds = useRef<
     Partial<Record<keyof typeof SOUND_SRC, HTMLAudioElement>>
   >({});
@@ -66,14 +81,13 @@ export default function ScanButton() {
     }
     if (state === "scanned") {
       playSound("confirmed");
-      trigger("success");
       const timer = setTimeout(() => {
         setCopyReady(false);
         setState("idle");
       }, SCANNED_MS);
       return () => clearTimeout(timer);
     }
-  }, [state, trigger]);
+  }, [state]);
 
   return (
     <>
@@ -97,10 +111,10 @@ export default function ScanButton() {
         animate={{ scale: state === "scanning" ? 0.92 : 1 }}
         transition={{
           layout: state === "idle" ? LAYOUT_SPRING_IDLE : LAYOUT_SPRING_ACTIVE,
-          scale: { type: "spring", bounce: 0.4, duration: 0.35 },
+          scale: TAP_SCALE_TRANSITION,
         }}
         onLayoutAnimationComplete={() => setCopyReady(true)}
-        className="relative flex h-10 cursor-pointer items-center rounded-full border border-neutral-200 bg-neutral-50 px-3 font-medium text-base hover:bg-neutral-100/90 disabled:cursor-default before:absolute before:-inset-2 before:content-['']"
+        className="group relative flex cursor-pointer items-center rounded-full p-2 -m-2 disabled:cursor-default"
       >
         <motion.span
           layout
@@ -108,7 +122,7 @@ export default function ScanButton() {
             layout:
               state === "idle" ? LAYOUT_SPRING_IDLE : LAYOUT_SPRING_ACTIVE,
           }}
-          className="relative flex items-center gap-2 overflow-hidden [clip-path:inset(0)]"
+          className="relative flex h-10 items-center gap-2 overflow-hidden rounded-full border border-neutral-200 bg-neutral-50 px-3 font-medium text-base [clip-path:inset(0)] group-hover:bg-neutral-100/90"
         >
           <motion.span
             layout
@@ -126,9 +140,9 @@ export default function ScanButton() {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: -2, filter: "blur(16px)" }}
                   transition={{
-                    y: { duration: 0.2, ease: "easeOut" },
-                    opacity: { duration: 0.2 },
-                    filter: { duration: 0.2 },
+                    y: { duration: REVEAL_TRANSITION_S, ease: "easeOut" },
+                    opacity: { duration: REVEAL_TRANSITION_S },
+                    filter: { duration: REVEAL_TRANSITION_S },
                   }}
                   className="[grid-area:1/1] flex h-4 w-4 items-center justify-center"
                 >
@@ -147,9 +161,9 @@ export default function ScanButton() {
                   animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
                   exit={{ opacity: 0, y: -2, filter: "blur(16px)" }}
                   transition={{
-                    y: { duration: 0.2, ease: "easeOut" },
-                    opacity: { duration: 0.2 },
-                    filter: { duration: 0.2 },
+                    y: { duration: REVEAL_TRANSITION_S, ease: "easeOut" },
+                    opacity: { duration: REVEAL_TRANSITION_S },
+                    filter: { duration: REVEAL_TRANSITION_S },
                   }}
                   className="[grid-area:1/1] grid h-4 w-4 place-items-center overflow-visible"
                 >
@@ -169,12 +183,8 @@ export default function ScanButton() {
                         initial={{ y: -8, opacity: 0 }}
                         animate={{ y: [-8, 8, -8], opacity: 1 }}
                         transition={{
-                          y: {
-                            duration: 1.8,
-                            repeat: Infinity,
-                            ease: "easeInOut",
-                          },
-                          opacity: { duration: 0.2 },
+                          y: SCANNER_SWEEP_TRANSITION,
+                          opacity: { duration: REVEAL_TRANSITION_S },
                         }}
                       >
                         <Image
@@ -206,9 +216,16 @@ export default function ScanButton() {
               transition={{
                 layout:
                   state === "idle" ? LAYOUT_SPRING_IDLE : LAYOUT_SPRING_ACTIVE,
-                y: { duration: state === "idle" ? 0 : 0.2, ease: "easeOut" },
-                opacity: { duration: state === "idle" ? 0 : 0.2 },
-                filter: { duration: state === "idle" ? 0 : 0.2 },
+                y: {
+                  duration: state === "idle" ? 0 : REVEAL_TRANSITION_S,
+                  ease: "easeOut",
+                },
+                opacity: {
+                  duration: state === "idle" ? 0 : REVEAL_TRANSITION_S,
+                },
+                filter: {
+                  duration: state === "idle" ? 0 : REVEAL_TRANSITION_S,
+                },
               }}
             >
               {COPY[state]}
