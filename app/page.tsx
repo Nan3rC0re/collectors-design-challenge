@@ -108,7 +108,7 @@ export default function Home() {
             <TapButton />
           </DemoCard>
         </section>
-        <section className="mb-16">
+        <section className="mb-10">
           <h2 className="mb-3 text-lg font-semibold text-neutral-900">Sound</h2>
           <p className=" leading-relaxed">
             The best part of this process was spending a couple of minutes on
@@ -131,12 +131,26 @@ export default function Home() {
             className="w-full rounded-2xl border border-neutral-200"
           />
         </section>
-        <section className="mb-8">
+        <section className="mb-10">
           I really enjoyed designing and building this. If I had time, another
           form of feedback I would have liked to incorporate would be haptic
           feedback for mobile users.
         </section>
-
+        <section className="mb-10">
+          <h2 className="mb-3 text-lg font-semibold text-neutral-900">
+            How I used AI
+          </h2>
+          <ul className="list-disc space-y-1 pl-5 text-neutral-500 leading-relaxed">
+            <li>
+              I utilized Claude to help create different variations for the
+              write-up.
+            </li>
+            <li>
+              Helped with unifying state animations and removing redundant code.
+            </li>
+            <li>The sound feedback cues for the interaction.</li>
+          </ul>
+        </section>
         <section className="mb-8">
           <h2 className="mb-3 text-lg font-semibold text-neutral-900">
             Sources
@@ -178,22 +192,6 @@ export default function Home() {
                 Loom Video
               </a>
             </li>
-          </ul>
-        </section>
-
-        <section className="mb-8">
-          <h2 className="mb-3 text-lg font-semibold text-neutral-900">
-            How I used AI
-          </h2>
-          <ul className="list-disc space-y-1 pl-5 text-neutral-500 leading-relaxed">
-            <li>
-              I utilized Claude to help create different variations for the
-              write-up.
-            </li>
-            <li>
-              Helped with unifying state animations and removing redundant code.
-            </li>
-            <li>The sound feedback cues for the interaction.</li>
           </ul>
         </section>
       </article>
